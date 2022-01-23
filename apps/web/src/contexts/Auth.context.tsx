@@ -6,10 +6,16 @@ import {
   useState,
 } from 'react';
 
+import {
+  GetServerSideProps,
+  GetServerSidePropsContext,
+  GetServerSidePropsResult,
+} from 'next';
 import Router from 'next/router';
 
-import { api, setAuthorizationHeader } from 'app/services/api';
+import { api, setAuthorization } from 'app/services/api';
 import { User, SessionsResponse } from 'app/services/api/dtos';
+import { AuthorizationError } from 'app/services/api/errors/AuthorizationError';
 import {
   destroyJwtTokens,
   getAccessToken,
@@ -46,7 +52,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           setUser(response.data);
         })
         .catch(() => {
-          signOut();
+          browserSignOut();
         });
     }
   }, []);
@@ -60,7 +66,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
       saveJwtTokens(data);
 
-      setAuthorizationHeader(data.accessToken);
+      setAuthorization(data.accessToken);
 
       setUser(data.user);
 
@@ -85,7 +91,60 @@ export const useAuth = () => {
   return auth;
 };
 
-export const signOut = () => {
+export const browserSignOut = () => {
+  if (!process.browser) {
+    return;
+  }
   destroyJwtTokens();
   Router.push('/');
 };
+
+export function withSSRGuest<T>(fn: GetServerSideProps<T>) {
+  return async (
+    ctx: GetServerSidePropsContext
+  ): Promise<GetServerSidePropsResult<T>> => {
+    const accessToken = getAccessToken(ctx);
+
+    if (accessToken) {
+      return {
+        redirect: {
+          destination: '/dashboard',
+          permanent: false,
+        },
+      };
+    }
+
+    return fn(ctx);
+  };
+}
+
+export function withSSRAuth<T>(fn: GetServerSideProps<T>) {
+  return async (
+    ctx: GetServerSidePropsContext
+  ): Promise<GetServerSidePropsResult<T>> => {
+    const accessToken = getAccessToken(ctx);
+
+    if (!accessToken) {
+      return {
+        redirect: {
+          destination: '/',
+          permanent: false,
+        },
+      };
+    }
+
+    try {
+      return await fn(ctx);
+    } catch (err) {
+      if (err instanceof AuthorizationError) {
+        destroyJwtTokens(ctx);
+        return {
+          redirect: {
+            destination: '/',
+            permanent: false,
+          },
+        };
+      }
+    }
+  };
+}

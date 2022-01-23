@@ -12,25 +12,25 @@ interface SaveJwtTokensProps {
   refreshToken: string;
 }
 
-export const saveJwtTokens = ({
-  accessToken,
-  refreshToken,
-}: SaveJwtTokensProps) => {
-  setCookie(undefined, TOKEN_COOKIE_NAME, accessToken, COOKIE_CONFIG);
-  setCookie(undefined, REFRESH_TOKEN_COOKIE_NAME, refreshToken, COOKIE_CONFIG);
+export const saveJwtTokens = (
+  { accessToken, refreshToken }: SaveJwtTokensProps,
+  ctx = undefined
+) => {
+  setCookie(ctx, TOKEN_COOKIE_NAME, accessToken, COOKIE_CONFIG);
+  setCookie(ctx, REFRESH_TOKEN_COOKIE_NAME, refreshToken, COOKIE_CONFIG);
 };
 
-export const getAccessToken = () => {
-  const cookies = parseCookies();
+export const getAccessToken = (ctx = undefined) => {
+  const cookies = parseCookies(ctx);
   return cookies[TOKEN_COOKIE_NAME];
 };
 
-export const getRefreshToken = () => {
-  const cookies = parseCookies();
+export const getRefreshToken = (ctx = undefined) => {
+  const cookies = parseCookies(ctx);
   return cookies[REFRESH_TOKEN_COOKIE_NAME];
 };
 
-export const destroyJwtTokens = () => {
-  destroyCookie(undefined, TOKEN_COOKIE_NAME);
-  destroyCookie(undefined, REFRESH_TOKEN_COOKIE_NAME);
+export const destroyJwtTokens = (ctx = undefined) => {
+  destroyCookie(ctx, TOKEN_COOKIE_NAME);
+  destroyCookie(ctx, REFRESH_TOKEN_COOKIE_NAME);
 };

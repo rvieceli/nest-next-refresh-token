@@ -1,10 +1,11 @@
 import { AxiosError, AxiosInstance } from 'axios';
 
-import { signOut } from 'app/contexts/Auth.context';
+import { browserSignOut } from 'app/contexts/Auth.context';
 
 import { getRefreshToken, saveJwtTokens } from '../../cookies';
 import { SessionsResponse } from '../dtos';
-import { setAuthorizationHeader } from '../helpers/setAuthorizationHeader';
+import { AuthorizationError } from '../errors/AuthorizationError';
+import { setAuthorization } from '../helpers/setAuthorization';
 
 type Queue = {
   onFulfilled: (token: string) => void;
@@ -13,7 +14,10 @@ type Queue = {
 
 const REFRESH_URL = '/refresh';
 
-export const refreshTokenInterceptor = (api: AxiosInstance): VoidFunction => {
+export const refreshTokenInterceptor = (
+  api: AxiosInstance,
+  ctx = undefined
+): VoidFunction => {
   let isRefreshing = false;
 
   const failedRequestsQueue: Queue[] = [];
@@ -28,15 +32,15 @@ export const refreshTokenInterceptor = (api: AxiosInstance): VoidFunction => {
           if (!isRefreshing) {
             isRefreshing = true;
 
-            const refreshToken = getRefreshToken();
+            const refreshToken = getRefreshToken(ctx);
 
             api
               .post<SessionsResponse>(REFRESH_URL, { refreshToken })
               .then((response) => {
                 const data = response.data;
 
-                saveJwtTokens(data);
-                setAuthorizationHeader(data.accessToken);
+                saveJwtTokens(data, ctx);
+                setAuthorization(data.accessToken, api);
 
                 return data.accessToken;
               })
@@ -49,6 +53,7 @@ export const refreshTokenInterceptor = (api: AxiosInstance): VoidFunction => {
                 failedRequestsQueue.forEach((request) =>
                   request.onRejected(err)
                 );
+                browserSignOut();
               })
               .finally(() => {
                 isRefreshing = false;
@@ -59,7 +64,7 @@ export const refreshTokenInterceptor = (api: AxiosInstance): VoidFunction => {
           return new Promise((resolve, reject) => {
             failedRequestsQueue.push({
               onFulfilled: (token: string) => {
-                setAuthorizationHeader(token, requestConfig.headers);
+                setAuthorization(token, requestConfig);
 
                 resolve(api(requestConfig));
               },
@@ -67,7 +72,10 @@ export const refreshTokenInterceptor = (api: AxiosInstance): VoidFunction => {
             });
           });
         } else {
-          signOut();
+          if (!process.browser) {
+            return Promise.reject(new AuthorizationError());
+          }
+          browserSignOut();
         }
       }
 

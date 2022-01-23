@@ -1,15 +1,5 @@
-import axios from 'axios';
+import { setupClient } from './setupClient';
 
-import { getAccessToken } from '../cookies';
-import { setAuthorizationHeader } from './helpers/setAuthorizationHeader';
-import { refreshTokenInterceptor } from './interceptors/refreshToken.interceptor';
+export const api = setupClient();
 
-const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
-});
-
-setAuthorizationHeader(getAccessToken());
-
-refreshTokenInterceptor(api);
-
-export { api, setAuthorizationHeader };
+export * from './helpers';
