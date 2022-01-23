@@ -9,8 +9,46 @@
   "overrides": [
     {
       "files": ["*.ts", "*.tsx", "*.js", "*.jsx"],
+      "plugins": ["import"],
       "rules": {
-        "@next/next/no-html-link-for-pages": ["error", "apps/web/pages"]
+        "@next/next/no-html-link-for-pages": ["error", "apps/web/src/pages"],
+        "import/order": [
+          "warn",
+          {
+            "pathGroups": [
+              {
+                "pattern": "react",
+                "group": "builtin",
+                "position": "before"
+              },
+              {
+                "pattern": "next",
+                "group": "builtin"
+              },
+              {
+                "pattern": "next/**",
+                "group": "builtin"
+              },
+              {
+                "pattern": "app/**",
+                "group": "internal"
+              }
+            ],
+            "groups": [
+              "builtin",
+              "external",
+              "internal",
+              ["parent", "sibling", "index"],
+              "object"
+            ],
+            "alphabetize": {
+              "order": "asc",
+              "caseInsensitive": true
+            },
+            "newlines-between": "always",
+            "pathGroupsExcludedImportTypes": ["builtin"]
+          }
+        ]
       }
     },
     {
