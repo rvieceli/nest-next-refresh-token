@@ -6,7 +6,7 @@ import { useCan } from '../hooks/useCan';
 import { setupClient } from '../services/api/setupClient';
 
 const Dashboard: NextPage = () => {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const canSeeMetrics = useCan({ permissions: ['metrics.list'] });
 
   return (
@@ -22,6 +22,8 @@ const Dashboard: NextPage = () => {
       <Can not roles={['editor']} permissions={'post.edit'}>
         <p>I am not an editor and I cannot edit a post</p>
       </Can>
+
+      <button onClick={signOut}>Leave</button>
     </div>
   );
 };

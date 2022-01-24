@@ -6,6 +6,7 @@ import { api, setAuthorization } from '../../services/api';
 import { SessionsResponse, User } from '../../services/api/dtos';
 import { getAccessToken, saveJwtTokens } from '../../services/cookies';
 import { browserSignOut } from './browserSignOut';
+import { authChannel } from './Channel';
 import { AuthContext, SignInCredentials } from './Context';
 
 interface AuthProviderProps {
@@ -30,6 +31,20 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     }
   }, []);
 
+  useEffect(() => {
+    authChannel.onmessage = () => document.location.reload();
+    // authChannel.onmessage = (message) => {
+    //   switch (message.data) {
+    //     case 'SIGN_OUT':
+    //       Router.push('/');
+    //       break;
+    //     case 'SIGN_IN':
+    //       document.location.reload();
+    //       break;
+    //   }
+    // };
+  }, []);
+
   const signIn = async (credentials: SignInCredentials) => {
     try {
       const { data } = await api.post<SessionsResponse>(
@@ -43,6 +58,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
       setUser(data.user);
 
+      authChannel.postMessage('SIGN_IN');
+
       Router.push('/dashboard');
     } catch (err) {
       alert('Email or password invalid');
@@ -51,7 +68,12 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated: Boolean(user), signIn, user }}
+      value={{
+        isAuthenticated: Boolean(user),
+        signIn,
+        user,
+        signOut: browserSignOut,
+      }}
     >
       {children}
     </AuthContext.Provider>
