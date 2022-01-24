@@ -1,18 +1,21 @@
 import { Fragment, ReactNode } from 'react';
 
-import { useCan, UseCanParams } from '../../hooks/useCan';
+import { RequireAtLeastOne } from '@auth/shared-types';
 
-interface CanProps {
+import { PermissionsAndRoles } from '../../contexts/Auth.context';
+import { useCan } from '../../hooks/useCan';
+
+type CanProps = {
   children: ReactNode;
   not?: boolean;
-}
+} & RequireAtLeastOne<PermissionsAndRoles>;
 
 export const Can = ({
   children,
   permissions,
   roles,
   not = false,
-}: CanProps & UseCanParams) => {
+}: CanProps) => {
   const canSee = useCan({ permissions, roles });
 
   if (canSee === not) {

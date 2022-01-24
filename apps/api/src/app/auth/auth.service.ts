@@ -1,10 +1,10 @@
+import { JwtTokenPayload } from '@auth/shared-types';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { EnvironmentVariables } from '../app.module';
 import { UsersService } from '../users/users.service';
 import { JwtRefreshTokenPayload } from './dtos/jwt-refresh-token-payload.dto';
-import { JwtTokenPayload } from './dtos/jwt-token-payload.dto';
 import { JwtTokensWithUser } from './dtos/jwt-tokens-with-user.dto';
 
 @Injectable()
