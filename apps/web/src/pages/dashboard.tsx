@@ -1,26 +1,27 @@
-import { useEffect, useState } from 'react';
-
 import type { GetServerSideProps, NextPage } from 'next';
 
-import { useAuth, withSSRAuth } from 'app/contexts/Auth.context';
-import { api } from 'app/services/api';
-import { setupClient } from 'app/services/api/setupClient';
+import { Can } from '../components';
+import { useAuth, withSSRAuth } from '../contexts/Auth.context';
+import { useCan } from '../hooks/useCan';
+import { setupClient } from '../services/api/setupClient';
 
 const Dashboard: NextPage = () => {
   const { user } = useAuth();
-  const [apiUser, setApiUser] = useState();
-
-  useEffect(() => {
-    api
-      .get('/me')
-      .then((response) => setApiUser(response.data))
-      .catch(() => console.log('Wow no'));
-  }, []);
+  const canSeeMetrics = useCan({ permissions: ['metrics.list'] });
 
   return (
     <div>
       <h1>Hi, {user?.email}</h1>
-      <code>{JSON.stringify(apiUser)}</code>
+
+      <Can roles={'administrator'}>
+        <p>I am an administrator</p>
+      </Can>
+
+      {canSeeMetrics && <p>I can see the metrics</p>}
+
+      <Can not roles={['editor']} permissions={'post.edit'}>
+        <p>I am not an editor and I cannot edit a post</p>
+      </Can>
     </div>
   );
 };

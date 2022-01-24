@@ -1,6 +1,6 @@
 import Router from 'next/router';
 
-import { destroyJwtTokens } from 'app/services/cookies';
+import { destroyJwtTokens } from '../../services/cookies';
 
 export const browserSignOut = () => {
   if (!process.browser) {

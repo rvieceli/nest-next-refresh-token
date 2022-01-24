@@ -4,8 +4,8 @@ import {
   GetServerSidePropsResult,
 } from 'next';
 
-import { AuthorizationError } from 'app/services/api/errors/AuthorizationError';
-import { destroyJwtTokens, getAccessToken } from 'app/services/cookies';
+import { AuthorizationError } from '../../services/api/errors/AuthorizationError';
+import { destroyJwtTokens, getAccessToken } from '../../services/cookies';
 
 export function withSSRAuth<T>(fn: GetServerSideProps<T>) {
   return async (

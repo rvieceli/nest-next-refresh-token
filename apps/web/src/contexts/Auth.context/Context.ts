@@ -1,6 +1,6 @@
 import { createContext } from 'react';
 
-import { User } from 'app/services/api/dtos';
+import { User } from '../../services/api/dtos';
 
 export interface SignInCredentials {
   email: string;

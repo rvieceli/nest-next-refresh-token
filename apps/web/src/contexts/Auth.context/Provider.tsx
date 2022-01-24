@@ -2,10 +2,9 @@ import { ReactNode, useEffect, useState } from 'react';
 
 import Router from 'next/router';
 
-import { api, setAuthorization } from 'app/services/api';
-import { SessionsResponse, User } from 'app/services/api/dtos';
-import { getAccessToken, saveJwtTokens } from 'app/services/cookies';
-
+import { api, setAuthorization } from '../../services/api';
+import { SessionsResponse, User } from '../../services/api/dtos';
+import { getAccessToken, saveJwtTokens } from '../../services/cookies';
 import { browserSignOut } from './browserSignOut';
 import { AuthContext, SignInCredentials } from './Context';
 

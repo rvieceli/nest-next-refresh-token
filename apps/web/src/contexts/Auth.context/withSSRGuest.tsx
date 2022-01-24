@@ -4,7 +4,7 @@ import {
   GetServerSidePropsResult,
 } from 'next';
 
-import { getAccessToken } from 'app/services/cookies';
+import { getAccessToken } from '../../services/cookies';
 
 export function withSSRGuest<T>(fn: GetServerSideProps<T>) {
   return async (

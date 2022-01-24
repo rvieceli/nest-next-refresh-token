@@ -2,8 +2,7 @@ import { FormEvent, useState } from 'react';
 
 import type { GetServerSideProps, NextPage } from 'next';
 
-import { useAuth, withSSRGuest } from 'app/contexts/Auth.context';
-
+import { useAuth, withSSRGuest } from '../contexts/Auth.context';
 import styles from './index.module.css';
 
 const Home: NextPage = () => {

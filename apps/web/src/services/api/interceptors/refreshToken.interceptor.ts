@@ -1,7 +1,6 @@
 import { AxiosError, AxiosInstance } from 'axios';
 
-import { browserSignOut } from 'app/contexts/Auth.context';
-
+import { browserSignOut } from '../../../contexts/Auth.context';
 import { getRefreshToken, saveJwtTokens } from '../../cookies';
 import { SessionsResponse } from '../dtos';
 import { AuthorizationError } from '../errors/AuthorizationError';
