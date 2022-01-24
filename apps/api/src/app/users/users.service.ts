@@ -1,10 +1,6 @@
+import { RequireAtLeastOne } from '@auth/shared-types';
 import { Injectable } from '@nestjs/common';
 import { User } from './entities/user.entity';
-
-type RequireAtLeastOne<T> = {
-  [K in keyof T]-?: Required<Pick<T, K>> &
-    Partial<Pick<T, Exclude<keyof T, K>>>;
-}[keyof T];
 
 @Injectable()
 export class UsersService {
